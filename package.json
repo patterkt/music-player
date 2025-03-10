@@ -1,0 +1,16 @@
+{
+  "name": "music-link",
+  "version": "1.0.0",
+  "description": "Music direct link service",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+    "dependencies": {
+      "bytes": "^3.1.2",
+      "dotenv": "^16.4.7",
+      "express": "^4.21.2",
+      "node-cache": "^5.1.2",
+      "range-parser": "^1.2.1"
+    }
+} 
