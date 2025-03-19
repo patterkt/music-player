@@ -28,7 +28,7 @@ if (!fs.existsSync(musicDir)) {
   console.log(`Created music directory: ${musicDir}`);
 }
 
-// 创建缓存实例，TTL 设置为1小时
+// 创建缓存实例，TTL 设置为2小时
 const cache = new NodeCache({ 
   stdTTL: 7200,
   checkperiod: 120,
@@ -41,8 +41,19 @@ const stats = {
   requests: 0
 };
 
+// 设置 JSON 格式化
+app.set('json spaces', 2);
+
 // 静态文件服务
 app.use('/static', express.static(musicDir));
+
+// 添加 CORS 中间件
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+});
 
 // 直链生成
 app.get('/music/:filename', async (req, res) => {
