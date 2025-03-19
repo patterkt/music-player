@@ -182,7 +182,6 @@ app.get('/api/download', async (req, res) => {
 
   // 检查文件是否已存在
   if (fs.existsSync(savePath)) {
-    // 构建现有文件的URL
     const protocol = req.headers['x-forwarded-proto'] || req.protocol;
     const host = req.get('host');
     const fileUrl = `${protocol}://${host}/music/${encodeURIComponent(fullName)}`;
@@ -193,10 +192,23 @@ app.get('/api/download', async (req, res) => {
     });
   }
 
+  // 立即返回响应
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+  const host = req.get('host');
+
+  res.json({
+    success: true,
+    message: 'The song added to download list successfully',
+    filename: fullName,
+    futureUrl: `${protocol}://${host}/music/${encodeURIComponent(fullName)}`,
+  });
+
+  // 在后台继续下载
   try {
     const response = await axios({
       method: 'GET',
       url: url,
+      timeout: 300000,
       responseType: 'stream'
     });
 
@@ -204,26 +216,17 @@ app.get('/api/download', async (req, res) => {
 
     response.data.pipe(writer);
 
-    writer.on('finish', () => {
-      res.json({
-        success: true,
-        message: 'The song download successfully',
-        filename: fullName
-      });
+    writer.on('error', (err) => {
+      console.error(`Download error for ${fullName}:`, err.message);
+      fs.unlink(savePath, () => {});
     });
 
-    writer.on('error', (err) => {
-      fs.unlink(savePath, () => {});  
-      res.status(500).json({
-        error: 'download error',
-        details: err.message
-      });
+    writer.on('finish', () => {
+      console.log(`Download finished ${fullName}`);
     });
   } catch (error) {
-    res.status(500).json({
-      error: 'download faild',
-      details: error.message
-    });
+    console.error(`Download failed for ${fullName}:`, error.message);
+    fs.unlink(savePath, () => {});
   }
 });
 
