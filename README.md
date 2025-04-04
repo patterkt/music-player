@@ -13,3 +13,7 @@ https://你的域名/api/download?url=音乐下载链接&name=保存后的歌曲
 
 音乐直链链接,支持的格式.mp3/.wav/.falc/.m4a
 http://你的ip:5000/music/歌曲名.mp3 或 https://你的域名/music/歌曲名.mp3
+
+
+[![image](iframe组件截图图片链接)](https://yxvm.com/)
+[NodeSupport](https://github.com/NodeSeekDev/NodeSupport)赞助了本项目
