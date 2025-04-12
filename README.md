@@ -14,7 +14,6 @@ https://你的域名/api/download?url=音乐下载链接&name=保存后的歌曲
 ```
 环境变量 ：url 必须  name 非必须
 
-音乐直链链接,支持的格式.mp3/.wav/.falc/.m4a\n
+音乐直链链接,支持的格式.mp3/.wav/.falc/.m4a
+
 https://你的域名/music/歌曲名-歌手.文件后缀名
-
-
