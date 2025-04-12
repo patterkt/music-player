@@ -2,7 +2,7 @@
 
 ## api
 获取音乐列表：
-GET http://你的ip:5000/api/music/list 或 https://你的域名/api/music/list
+```https://your—doamin/api/music/list```
 
 下载音乐到服务器：
 GET http://你的ip:5000/api/download?url=音乐下载链接&name=保存后的歌曲名称
