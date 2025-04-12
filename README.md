@@ -1,8 +1,10 @@
 ## 这是一个音乐直链服务
 
 ## api
-获取音乐列表：
-```https://your—doamin/api/music/list```
+```获取音乐列表:```
+```
+https://your—doamin/api/music/list
+```
 
 下载音乐到服务器：
 GET http://你的ip:5000/api/download?url=音乐下载链接&name=保存后的歌曲名称
