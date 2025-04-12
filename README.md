@@ -4,7 +4,7 @@
 ```获取音乐列表:``` 
 方式：GET
 ```
-https://域名/api/music/list
+https://你的域名/api/music/list
 ```
 
 ```下载音乐到服务器：```
@@ -14,7 +14,7 @@ https://你的域名/api/download?url=音乐下载链接&name=保存后的歌曲
 ```
 环境变量 ：url 必须  name 非必须
 
-音乐直链链接,支持的格式.mp3/.wav/.falc/.m4a
-http://你的ip:5000/music/歌曲名.mp3 或 https://你的域名/music/歌曲名.mp3
+音乐直链链接,支持的格式.mp3/.wav/.falc/.m4a\n
+https://你的域名/music/歌曲名-歌手.文件后缀名
 
 
