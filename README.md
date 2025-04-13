@@ -1,6 +1,6 @@
 ## 在线音乐播放器
 
-这是一个在线音乐播放器，集成api增加删除歌曲，可批量添加或删除，支持的音乐格式: mp3/wav/falc/m4a
+这是一个在线音乐播放器，集成api增加删除歌曲，可批量添加或删除，支持的音乐格式: mp3/wav/flac/m4a
 
 ## api
 ```获取音乐列表:``` 
@@ -37,6 +37,6 @@ https://你的域名/api/delete/music?password=管理密码&all=true
 ```
 
 ## 音乐直链链接
-```支持的格式: mp3/wav/falc/m4a```
+```支持的格式: mp3/wav/flac/m4a```
 
 https://你的域名/music/歌曲名-歌手.文件后缀名
