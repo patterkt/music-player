@@ -13,7 +13,7 @@ https://你的域名/api/music/list
 请求方式：GET
 ```环境变量 ：url 必须，name 非必须```
 ```
-https://你的域名/api/download?url=音乐下载链接&name=保存后的歌曲名称
+https://你的域名/api/download?url=音乐下载链接&name=保存后的歌曲名-歌手名
 ```
 
 ```删除音乐：```
