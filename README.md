@@ -19,6 +19,7 @@ https://你的域名/api/download?url=音乐下载链接&name=保存后的歌曲
 ```删除音乐：```
 ```password为管理密码,name或names为歌曲名，必填```
 方式：POST
+
 删除单首
 ```
 https://你的域名/api/delete/music?password=管理密码&name=歌曲名
