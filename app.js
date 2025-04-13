@@ -6,11 +6,14 @@ const bytes = require('bytes');
 const NodeCache = require('node-cache');
 const axios = require('axios');  
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3000;
 
 const musicDir = path.join(__dirname, process.env.MUSIC_DIR || 'music');
 
 require('dotenv').config();
+
+// 管理密码
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
 
 function getContentType(ext) {
   const contentTypes = {
@@ -22,13 +25,13 @@ function getContentType(ext) {
   return contentTypes[ext] || 'application/octet-stream';
 }
 
-// 确保音乐目录存在
+// 确保音乐目录存在,不存在自动创建
 if (!fs.existsSync(musicDir)) {
   fs.mkdirSync(musicDir, { recursive: true });
   console.log(`Created music directory: ${musicDir}`);
 }
 
-// 创建缓存实例，TTL 设置为2小时
+// 创建缓存实例，TTL 设置为1小时
 const cache = new NodeCache({ 
   stdTTL: 7200,
   checkperiod: 120,
@@ -41,19 +44,22 @@ const stats = {
   requests: 0
 };
 
-// 设置 JSON 格式化
+// JSON 格式化
 app.set('json spaces', 2);
 
 // 静态文件服务
 app.use('/static', express.static(musicDir));
 
-// 添加 CORS 中间件
+// CORS 中间件
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   next();
 });
+
+// 前端静态文件服务
+app.use(express.static(path.join(__dirname, 'public')));
 
 // 直链生成
 app.get('/music/:filename', async (req, res) => {
@@ -89,7 +95,7 @@ app.get('/music/:filename', async (req, res) => {
 
   const range = req.headers.range;
 
-  // 设置通用响应头
+  // 通用响应头
   res.set({
     'Cache-Control': 'public, max-age=3600',
     'Last-Modified': fileInfo.mtime,
@@ -156,7 +162,7 @@ app.get('/music/:filename', async (req, res) => {
   }
 });
 
-  // 统计接口
+// 统计接口
 app.get('/stats', (req, res) => {
   res.json({
     totalTransferred: bytes(stats.totalBytes),
@@ -164,8 +170,7 @@ app.get('/stats', (req, res) => {
   });
 });
 
-
-// 添加下载音乐的 API
+// 下载音乐API
 app.get('/api/download', async (req, res) => {
   const { url, name } = req.query;
   
@@ -203,7 +208,7 @@ app.get('/api/download', async (req, res) => {
     });
   }
 
-  // 立即返回响应
+  // api返回响应
   const protocol = req.headers['x-forwarded-proto'] || req.protocol;
   const host = req.get('host');
 
@@ -214,7 +219,7 @@ app.get('/api/download', async (req, res) => {
     futureUrl: `${protocol}://${host}/music/${encodeURIComponent(fullName)}`,
   });
 
-  // 在后台继续下载
+  // 将音乐加入后台异步下载
   try {
     const response = await axios({
       method: 'GET',
@@ -241,7 +246,7 @@ app.get('/api/download', async (req, res) => {
   }
 });
 
-// 获取音乐列表的 API
+// 获取音乐文件大小
 function formatFileSize(bytes) {
   const units = ['B', 'KB', 'MB', 'GB'];
   let size = bytes;
@@ -255,7 +260,7 @@ function formatFileSize(bytes) {
   return `${size.toFixed(2)}${units[unitIndex]}`;
 }
 
-  // 修改音乐列表 API
+// 获取音乐列表 API
 app.get('/api/music/list', async (req, res) => {
   try {
     const files = await fs.promises.readdir(musicDir);
@@ -294,7 +299,68 @@ app.get('/api/music/list', async (req, res) => {
   }
 });
 
+// 删除音乐API - 使用POST请求
+app.post('/api/delete/music', async (req, res) => {
+  const { names, password, all } = req.query;
+
+  // 验证管理密码
+  if (password !== ADMIN_PASSWORD) {
+    return res.status(401).json({ error: 'Unauthorized: Invalid password' });
+  }
+
+  try {
+    let filesToDelete = [];
+    
+    // 情况1: 删除所有音乐文件
+    if (all === 'true') {
+      const files = await fs.promises.readdir(musicDir);
+      filesToDelete = files.filter(file => 
+        ['.mp3', '.wav', '.flac', '.m4a'].includes(path.extname(file).toLowerCase())
+      );
+    } 
+    // 情况2: 批量删除指定名称的音乐文件
+    else if (names) {
+      const nameList = typeof names === 'string' ? names.split(',') : names;
+      const files = await fs.promises.readdir(musicDir);
+      
+      filesToDelete = files.filter(file => {
+        const filenameWithoutExt = path.basename(file, path.extname(file));
+        const songNamePart = filenameWithoutExt.split('-')[0].trim().toLowerCase();
+        return nameList.some(name => 
+          songNamePart === name.trim().toLowerCase() && 
+          ['.mp3', '.wav', '.flac', '.m4a'].includes(path.extname(file).toLowerCase())
+        );
+      });
+    } 
+    else {
+      return res.status(400).json({ error: 'Please provide names parameter or set all=true' });
+    }
+
+    if (filesToDelete.length === 0) {
+      return res.status(404).json({ error: 'No matching songs found' });
+    }
+
+    // 删除所有匹配的文件
+    await Promise.all(filesToDelete.map(async file => {
+      const filePath = path.join(musicDir, file);
+      await fs.promises.unlink(filePath);
+      cache.del(filePath);
+    }));
+
+    res.json({
+      success: true,
+      message: `Deleted ${filesToDelete.length} song(s)`,
+      deletedFiles: filesToDelete
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to delete song(s)',
+      details: error.message
+    });
+  }
+});
+
 // 启动服务器
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`music service is running on port ${PORT}`);
 });
