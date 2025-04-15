@@ -1,16 +1,13 @@
 //音乐播放器的类 单例模式
 class Player {
-    constructor() { //类的构造函数
-        //如果类已经有实例了，就返回这个实例
+    constructor() { 
         if (Player.instance) return Player.instance;
-        //如果没有实例化，就去构造一个实例
         return this.getInstance(...arguments);
     }
 
     //构建实例
     getInstance() {
         let instance = new PlayerCreator(...arguments);
-        //让实例可以使用到Player的原型的属性方法
         // instance.__proto__=Player.prototype;
         // instance.constructor=Player;
         //把构建好的实例挂在Player类上
@@ -21,7 +18,6 @@ class Player {
 
 //歌曲信息
 class Musics {
-    //歌曲
     constructor() {
         this.songs = [];
         this.loadMusicList();
