@@ -10,6 +10,7 @@ class Player {
     //构建实例
     getInstance() {
         let instance = new PlayerCreator(...arguments);
+        //让实例可以使用到Player的原型的属性方法
         // instance.__proto__=Player.prototype;
         // instance.constructor=Player;
         //把构建好的实例挂在Player类上
@@ -28,11 +29,11 @@ class Musics {
 
     loadMusicList() {
         $.ajax({
-            url: '/api/music/list',  // 修改为相对路径
+            url: '/api/music/list',  // 获取音乐列表的接口地址
             method: 'GET',
             async: false,
             success: (response) => {
-                const bgp = ["c.jpg", "yanyuan.jpg"];
+                const bgp = ["a.jpg", "b.jpg" , "c.jpg", "d.jpg", "e.jpg"];
                 if (response && response.data) {
                     response.data.forEach(item => {
                         const fileName = item.filename;
@@ -54,7 +55,7 @@ class Musics {
                             title: title,
                             singer: singer,
                             songUrl: item.url,
-                            imageUrl: 'https://musicsharing.github.io/static/music_data/images/' + bgp[Math.floor(Math.random() * bgp.length)]
+                            imageUrl: '/static/music_data/images/' + bgp[Math.floor(Math.random() * bgp.length)]
                         });
                     });
                 }
@@ -120,15 +121,29 @@ class PlayerCreator {
         this.bindEventListener();
     }
     //生成播放列表
+    // 修改 renderSongList 方法
     renderSongList() {
         this.song_list = $('.music__list_content');
         let _str = '';
         this.musics.songs.forEach((song, i) => {
-            // 添加 play 类到当前播放的歌曲
             const isPlaying = i === this.song_index ? ' class="music__list__item play"' : ' class="music__list__item"';
-            _str += `<li${isPlaying}>${song.title} - ${song.singer} <a href="${song.songUrl}" style="float:right;padding-right:12px">下载</a></li>`;
+            _str += `<li${isPlaying} data-index="${i}">${song.title} - ${song.singer} <a href="${song.songUrl}" style="float:right;padding-right:12px">下载</a></li>`;
         });
         this.song_list.html(_str);
+
+        // 重新绑定点击事件
+        this.song_list.off('click').on('click', 'li', (e) => {
+            if ($(e.target).is('a')) return; // 如果点击的是下载链接，不执行播放
+            const index = parseInt($(e.target).closest('li').data('index'));
+            if (!isNaN(index)) {
+                this.changeSong(index);
+                this.audio.play();
+                // 更新播放按钮状态
+                this.$play.$el.find('i').removeClass('icon-play').addClass('icon-pause');
+                this.disc.image.addClass('play');
+                this.disc.pointer.addClass('play');
+            }
+        });
     }
 
     //根据歌曲去渲染视图
@@ -400,6 +415,12 @@ class PlayerCreator {
             this.$play.$el.find('i').removeClass('icon-play').addClass('icon-pause');
             this.disc.image.addClass('play');
             this.disc.pointer.addClass('play');
+
+            // 3秒后自动返回列表
+            setTimeout(() => {
+                this.renderSongList();
+                this.song_find.val('');
+            }, 3000);
         }
     }
 
