@@ -465,3 +465,101 @@ body {
 .foot_marker a:hover {
     color: #4388e0;
 }
+
+
+/* 在 player.css 中添加以下样式 */
+.management-btn {
+    position: absolute;
+    right: 20px;
+    background: rgba(67, 136, 224, 0.3);
+    color: #fff;
+    border: 0px solid #4388e0;
+    border-radius: 0.6rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    z-index: 1;
+}
+
+.management-btn:hover {
+    color: aquamarine;
+    background: rgba(0, 108, 226, 0.3);
+}
+
+/* 调整音量控制容器位置 */
+.player-control__volume {
+    position: relative;
+    float: right;
+     /* margin-top: 30px;为管理按钮腾出空间 */
+    overflow: hidden;
+}
+
+.management-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 1000;
+    width: 80%;
+    max-width: 500px;
+    border: 1px solid #4388e0;
+}
+
+.management-modal h3 {
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: #4388e0;
+    text-align: center;
+}
+
+.management-modal input, .management-modal button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    border: none;
+}
+
+.management-modal input {
+    background: rgba(83, 91, 91, 0.1);
+    color: #000000;
+}
+
+.management-modal button {
+    position: relative;
+    background: #4388e0;
+    color: white;
+    cursor: pointer;
+}
+
+.management-modal button:hover {
+    background: #3a7bc8;
+}
+
+.close-btn {
+    position: absolute;
+    font-size: 35px;
+    right: 5px;
+    top: -10px;
+    cursor: pointer;
+    color: #531007;
+}
+
+.close-btn:hover {
+    color: red;
+}
+
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 999;
+}
