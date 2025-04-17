@@ -2,6 +2,21 @@
 
 这是一个在线音乐播放器，集成api增加删除歌曲，可批量添加或删除，支持的音乐格式: mp3/wav/flac/m4a
 
+## 部署
+* 安装nodejs环境,可直接使用工具箱一键安装或使用下列命令安装
+```
+apt-get update -y
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && install nodejs
+```
+* 部署主体项目
+```
+apt install git screen -y
+git clone https://github.com/eooce/music-player
+cd music-player && rm -rf Dockerfile README.md
+npm install
+screen npm start 
+```
+
 ## api
 获取音乐列表:
 ```请求方式：GET```
@@ -22,7 +37,7 @@ https://你的域名/api/download?url=音乐下载链接&name=保存后的歌曲
 
 ```删除单首```
 ```
-https://你的域名/api/delete/music?password=管理密码&name=歌曲名
+https://你的域名/api/delete/music?password=管理密码&names=歌曲名
 ```
 ```删除多首```
 ```歌曲名之间用英文逗号分隔```
