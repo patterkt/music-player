@@ -12,7 +12,7 @@ curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash - && install no
 ```
 apt install git screen -y
 git clone https://github.com/eooce/music-player
-cd music-player && rm -rf Dockerfile README.md
+cd music-player && rm -rf Dockerfile README.md .github
 npm install
 screen npm start 
 ```
