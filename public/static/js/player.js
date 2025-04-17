@@ -218,12 +218,30 @@ class PlayerCreator {
         //禁音
         this.$ban = new Btns('.control__volume--icon', {
             click: this.banNotes.bind(this)
-        })
-        //列表点击
-        this.song_list.on('click', 'li', (e) => {
-            let index = $(e.target).index();
-            this.changeSong(index);
-        })
+        });
+
+        // 管理按钮
+        this.$management = new Btns('.management-btn', {
+            click: this.showManagementModal.bind(this)
+        });
+
+        // 关闭按钮
+        this.$closeModal = new Btns('.close-btn', {
+            click: this.hideManagementModal.bind(this)
+        });
+
+        // 添加歌曲按钮
+        this.$addSong = new Btns('#add-song', {
+            click: this.handleAddSong.bind(this)
+        });
+
+        // 删除歌曲按钮
+        this.$deleteSong = new Btns('#delete-song', {
+            click: this.handleDeleteSong.bind(this)
+        });
+
+        // 点击遮罩层关闭模态框
+        $('.modal-overlay').click(this.hideManagementModal.bind(this));
 
         //音量控制 audio标签音量 vlouem 属性控制0-1
         this.volume = new Progress('.control__volume--progress', {
@@ -279,6 +297,110 @@ class PlayerCreator {
             this.audio.play();
         }
 
+    }
+
+    // 显示管理模态框
+    showManagementModal() {
+        $('#song-url').val('');
+        $('#song-name').val('');
+        $('#admin-password').val('');
+        $('#delete-song-name').val('');
+        
+        $('.modal-overlay').fadeIn();
+        $('.management-modal').fadeIn();
+    }
+
+    // 隐藏管理模态框
+    hideManagementModal() {
+        $('#song-url').val('');
+        $('#song-name').val('');
+        $('#admin-password').val('');
+        $('#delete-song-name').val('');
+        
+        $('.modal-overlay').fadeOut();
+        $('.management-modal').fadeOut();
+    }
+
+    // 处理添加歌曲
+    handleAddSong() {
+        const url = $('#song-url').val().trim();
+        const name = $('#song-name').val().trim();
+        
+        if (!url) {
+            alert('请输入音乐URL');
+            return;
+        }
+    
+        // 保存当前播放状态
+        const wasPlaying = !this.audio.paused;
+        const currentTime = this.audio.currentTime;
+        const currentSongIndex = this.song_index;
+    
+        $.get('/api/download', { url, name })
+            .done(response => {
+                alert(response.success ? '歌曲已添加到下载队列' : response.error || '添加失败');
+                if (response.success) {
+                    // 刷新音乐列表但不重置播放状态
+                    this.musics = new Musics();
+                    setTimeout(() => {
+                        // 恢复之前的播放状态
+                        this.song_index = currentSongIndex;
+                        this.renderSongList();
+                        this.renderSongStyle();
+                        
+                        if (wasPlaying) {
+                            this.audio.currentTime = currentTime;
+                            this.audio.play();
+                            this.$play.$el.find('i').removeClass('icon-play').addClass('icon-pause');
+                            this.disc.image.addClass('play');
+                            this.disc.pointer.addClass('play');
+                        }
+                        
+                        this.hideManagementModal();
+                    }, 1000);
+                }
+            })
+            .fail(error => {
+                alert('添加失败: ' + (error.responseJSON?.error || error.statusText));
+            });
+    }
+
+    // 处理删除歌曲
+    handleDeleteSong() {
+        const password = $('#admin-password').val().trim();
+        const name = $('#delete-song-name').val().trim();
+        
+        if (!password) {
+            alert('请输入管理密码');
+            return;
+        }
+
+        const confirmMsg = name ? `确定要删除歌曲 "${name}" 吗?` : '确定要删除所有歌曲吗?';
+        if (!confirm(confirmMsg)) return;
+
+        $.post('/api/delete/music', { 
+            names: name || undefined,
+            password: password,
+            all: name ? undefined : 'true'
+        })
+        .done(response => {
+            alert(response.success ? `已删除 ${response.deletedFiles.length} 首歌曲` : response.error || '删除失败');
+            if (response.success) {
+                // 刷新音乐列表
+                this.musics = new Musics();
+                setTimeout(() => {
+                    this.renderSongList();
+                    this.renderSongStyle();
+                    if (this.song_index >= this.musics.songs.length) {
+                        this.song_index = 0;
+                    }
+                }, 1000);
+                this.hideManagementModal();
+            }
+        })
+        .fail(error => {
+            alert('删除失败: ' + (error.responseJSON?.error || error.statusText));
+        });
     }
 
     //播放暂停控制
@@ -529,7 +651,7 @@ class Progress {
 }
 
 
-//按钮类 
+//按钮 
 class Btns {
     constructor(selector, handlers) {
         this.$el = $(selector); //元素
