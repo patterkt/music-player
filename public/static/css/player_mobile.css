@@ -29,6 +29,10 @@ body {
     display: none;
 }
 
+.music__list__item.play:before {
+    top: 1px;
+}
+
 .music-player__list {
     height: 300px;  
     overflow-y: auto;
@@ -55,4 +59,9 @@ body {
     .music-player__list {
         height: 300px;  /* Edge浏览器也使用固定高度 */
     }
+}
+
+.management-btn {
+    position: absolute;
+    font-size: 0.6rem;
 }
