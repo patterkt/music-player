@@ -34,6 +34,7 @@
         <div class="music-player__controls">
             <!-- 歌曲信息 -->
             <div class="music__info">
+                <button class="management-btn">歌曲管理</button>
                 <h3 class="music__info--title">...</h3>
                 <p class="music__info--singer">...</p>
             </div>
@@ -85,10 +86,29 @@
     </div>
 </div>
 
+<!-- 歌曲管理模态框 -->
+<div class="modal-overlay"></div>
+<div class="management-modal">
+    <span class="close-btn">&times;</span>
+    <h3>歌曲管理</h3>
+    <div>
+        <input type="text" id="song-url" placeholder="音乐下载URL (mp3/wav/flac/m4a)">
+        <input type="text" id="song-name" placeholder="保存的歌曲名称 (格式：歌曲名-歌手)">
+        <button id="add-song">添加歌曲</button>
+    </div>
+    <div style="margin-top: 1.5rem;">
+        <input type="text" id="delete-song-name" placeholder="请输入要删除的歌曲名称,不带歌手名和文件后缀 (留空删除所有)">
+                <input type="password" id="admin-password" placeholder="管理密码">
+        <button id="delete-song">删除歌曲</button>
+    </div>
+</div>
+
 <script src="static/js/utill.js"></script>
 <script src="static/js/jquery.min.js"></script>
 <script src="https://musicsharing.github.io/music/music_list.js"></script>
 <script src="static/js/player.js"></script>
 <script src="static/js/get_music_list.js"></script>
-<!-- <script src="/static/js/star.js"></script> 关闭流量效果-->
+<script src="/static/js/star.js"></script>
+<!-- <script src="/static/js/star.js"></script> 关闭流量效果,开启请取消注释-->
+</body>
 </html>
