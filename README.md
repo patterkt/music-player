@@ -3,6 +3,8 @@
 这是一个在线音乐播放器，集成api增加删除歌曲，可批量添加或删除，支持的音乐格式: mp3/wav/flac/m4a
 
 ## 部署
+
+### 源代码部署
 * 安装nodejs环境,可直接使用工具箱一键安装或使用下列命令安装
 ```
 apt-get update -y
@@ -15,6 +17,12 @@ git clone https://github.com/eooce/music-player
 cd music-player && rm -rf Dockerfile README.md .github
 npm install
 screen npm start 
+```
+
+### Docker一键部署
+
+```
+ghcr.io/eooce/music-player:latest
 ```
 
 ## api
