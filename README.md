@@ -20,9 +20,28 @@ screen npm start
 ```
 
 ### Docker一键部署
+* 管理密码环境变量：`ADMIN_PASSWORD`
 
 ```
 ghcr.io/eooce/music-player:latest
+```
+## Docker-compose一键部署
+```bash
+version: '3'
+
+services:
+  merge-sub:
+    image: ghcr.io/eooce/music-player:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - music-data:/app/music
+    environment:
+      - PORT=3000
+    restart: unless-stopped
+
+volumes:
+  music-data:
 ```
 
 ## api
