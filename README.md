@@ -25,7 +25,7 @@ screen npm start
 ```
 ghcr.io/eooce/music-player:latest
 ```
-## Docker-compose一键部署
+### Docker-compose一键部署
 ```bash
 version: '3'
 
