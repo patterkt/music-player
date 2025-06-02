@@ -8,12 +8,16 @@ const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+require('dotenv').config(); // 加载环境变量
+
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin'; // 管理密码
 const musicDir = path.join(__dirname, process.env.MUSIC_DIR || 'music');
 
-require('dotenv').config();
-
-// 管理密码
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
+// 确保音乐目录存在,不存在自动创建
+if (!fs.existsSync(musicDir)) {
+  fs.mkdirSync(musicDir, { recursive: true });
+  console.log(`Created music directory: ${musicDir}`);
+}
 
 function getContentType(ext) {
   const contentTypes = {
@@ -23,12 +27,6 @@ function getContentType(ext) {
     '.m4a': 'audio/mp4'
   };
   return contentTypes[ext] || 'application/octet-stream';
-}
-
-// 确保音乐目录存在,不存在自动创建
-if (!fs.existsSync(musicDir)) {
-  fs.mkdirSync(musicDir, { recursive: true });
-  console.log(`Created music directory: ${musicDir}`);
 }
 
 // 创建缓存实例，TTL 设置为1小时
