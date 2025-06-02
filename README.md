@@ -30,7 +30,7 @@ ghcr.io/eooce/music-player:latest
 version: '3'
 
 services:
-  merge-sub:
+  music-player:
     image: ghcr.io/eooce/music-player:latest
     ports:
       - "3000:3000"
