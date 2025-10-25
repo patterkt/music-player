@@ -8,16 +8,12 @@ const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-require('dotenv').config(); // 加载环境变量
-
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin'; // 管理密码
 const musicDir = path.join(__dirname, process.env.MUSIC_DIR || 'music');
 
-// 确保音乐目录存在,不存在自动创建
-if (!fs.existsSync(musicDir)) {
-  fs.mkdirSync(musicDir, { recursive: true });
-  console.log(`Created music directory: ${musicDir}`);
-}
+require('dotenv').config();
+
+// 管理密码
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
 
 function getContentType(ext) {
   const contentTypes = {
@@ -27,6 +23,12 @@ function getContentType(ext) {
     '.m4a': 'audio/mp4'
   };
   return contentTypes[ext] || 'application/octet-stream';
+}
+
+// 确保音乐目录存在,不存在自动创建
+if (!fs.existsSync(musicDir)) {
+  fs.mkdirSync(musicDir, { recursive: true });
+  console.log(`Created music directory: ${musicDir}`);
 }
 
 // 创建缓存实例，TTL 设置为1小时
@@ -44,6 +46,10 @@ const stats = {
 
 // JSON 格式化
 app.set('json spaces', 2);
+
+// 解析请求体的中间件
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // 静态文件服务
 app.use('/static', express.static(musicDir));
@@ -64,7 +70,7 @@ app.get('/music/:filename', async (req, res) => {
   const filename = req.params.filename;
   
   // 检查文件名是否合法
-  if (!filename.match(/^[a-zA-Z0-9\u4e00-\u9fa5][a-zA-Z0-9\u4e00-\u9fa5\s\-_.]+\.(mp3|wav|flac|m4a)$/)) {
+  if (!filename.match(/^[\w\u4e00-\u9fa5\uac00-\ud7af\u0e00-\u0e7f][\w\u4e00-\u9fa5\uac00-\ud7af\u0e00-\u0e7f\s\-_.(),，（）]+\.(mp3|wav|flac|m4a)$/i)) {
     return res.status(400).send('Invalid filename');
   }
 
@@ -188,7 +194,7 @@ app.get('/api/download', async (req, res) => {
   const fullName = name ? (name + urlExt) : urlFileName;
 
   // 验证文件名格式
-  if (!fullName.match(/^[a-zA-Z0-9\u4e00-\u9fa5][a-zA-Z0-9\u4e00-\u9fa5\s\-_.]+\.(mp3|wav|flac|m4a)$/)) {
+  if (!fullName.match(/^[\w\u4e00-\u9fa5\uac00-\ud7af\u0e00-\u0e7f][\w\u4e00-\u9fa5\uac00-\ud7af\u0e00-\u0e7f\s\-_.(),，（）]+\.(mp3|wav|flac|m4a)$/i)) {
     return res.status(400).json({ error: 'filename is wrong' });
   }
 
@@ -297,9 +303,11 @@ app.get('/api/music/list', async (req, res) => {
   }
 });
 
-// 删除音乐API - 使用POST请求
+// 删除音乐API
 app.post('/api/delete/music', async (req, res) => {
-  const { names, password, all } = req.query;
+  const names = req.body.names || req.query.names;
+  const password = req.body.password || req.query.password;
+  const all = req.body.all || req.query.all;
 
   // 验证管理密码
   if (password !== ADMIN_PASSWORD) {
