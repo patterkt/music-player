@@ -378,28 +378,37 @@ class PlayerCreator {
         const confirmMsg = name ? `确定要删除歌曲 "${name}" 吗?` : '确定要删除所有歌曲吗?';
         if (!confirm(confirmMsg)) return;
 
-        $.post('/api/delete/music', { 
-            names: name || undefined,
+        // 将参数作为请求体发送，提高安全性
+        const requestData = {
             password: password,
+            names: name || undefined,
             all: name ? undefined : 'true'
-        })
-        .done(response => {
-            alert(response.success ? `已删除 ${response.deletedFiles.length} 首歌曲` : response.error || '删除失败');
-            if (response.success) {
-                // 刷新音乐列表
-                this.musics = new Musics();
-                setTimeout(() => {
-                    this.renderSongList();
-                    this.renderSongStyle();
-                    if (this.song_index >= this.musics.songs.length) {
-                        this.song_index = 0;
-                    }
-                }, 1000);
-                this.hideManagementModal();
+        };
+
+        // 使用 AJAX 请求发送数据
+        $.ajax({
+            url: '/api/delete/music',
+            method: 'POST',
+            data: JSON.stringify(requestData),
+            contentType: 'application/json',
+            success: (response) => {
+                alert(response.success ? `已删除 ${response.deletedFiles.length} 首歌曲` : response.error || '删除失败');
+                if (response.success) {
+                    // 刷新音乐列表
+                    this.musics = new Musics();
+                    setTimeout(() => {
+                        this.renderSongList();
+                        this.renderSongStyle();
+                        if (this.song_index >= this.musics.songs.length) {
+                            this.song_index = 0;
+                        }
+                    }, 1000);
+                    this.hideManagementModal();
+                }
+            },
+            error: (xhr) => {
+                alert('删除失败: ' + (xhr.responseJSON?.error || xhr.statusText));
             }
-        })
-        .fail(error => {
-            alert('删除失败: ' + (error.responseJSON?.error || error.statusText));
         });
     }
 
