@@ -38,10 +38,8 @@ services:
       - music-data:/app/music
     environment:
       - PORT=3000
+      - ADMIN_PASSWORD=admin
     restart: unless-stopped
-
-volumes:
-  music-data:
 ```
 
 ## api
