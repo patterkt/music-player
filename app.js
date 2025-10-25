@@ -70,7 +70,7 @@ app.get('/music/:filename', async (req, res) => {
   const filename = req.params.filename;
   
   // 检查文件名是否合法
-  if (!filename.match(/^[\w\u4e00-\u9fa5\uac00-\ud7af\u0e00-\u0e7f][\w\u4e00-\u9fa5\uac00-\ud7af\u0e00-\u0e7f\s\-_.(),，（）]+\.(mp3|wav|flac|m4a)$/i)) {
+  if (!filename.match(/^[\w\u3040-\u309f\u30a0-\u30ff\u4e00-\u9fa5\uac00-\ud7af\u0e00-\u0e7f][\w\u3040-\u309f\u30a0-\u30ff\u4e00-\u9fa5\uac00-\ud7af\u0e00-\u0e7f\s\-_.(),，（）]+\.(mp3|wav|flac|m4a)$/i)) {
     return res.status(400).send('Invalid filename');
   }
 
@@ -194,7 +194,7 @@ app.get('/api/download', async (req, res) => {
   const fullName = name ? (name + urlExt) : urlFileName;
 
   // 验证文件名格式
-  if (!fullName.match(/^[\w\u4e00-\u9fa5\uac00-\ud7af\u0e00-\u0e7f][\w\u4e00-\u9fa5\uac00-\ud7af\u0e00-\u0e7f\s\-_.(),，（）]+\.(mp3|wav|flac|m4a)$/i)) {
+  if (!fullName.match(/^[\w\u3040-\u309f\u30a0-\u30ff\u4e00-\u9fa5\uac00-\ud7af\u0e00-\u0e7f][\w\u3040-\u309f\u30a0-\u30ff\u4e00-\u9fa5\uac00-\ud7af\u0e00-\u0e7f\s\-_.(),，（）]+\.(mp3|wav|flac|m4a)$/i)) {
     return res.status(400).json({ error: 'filename is wrong' });
   }
 
