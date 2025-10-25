@@ -38,7 +38,7 @@ services:
       - music-data:/app/music
     environment:
       - PORT=3000
-      - ADMIN_PASSWORD=admin
+      - ADMIN_PASSWORD=admin # 管理密码，删除歌曲时使用的
     restart: unless-stopped
 ```
 
